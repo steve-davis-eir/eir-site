@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+
+# Test results (regenerated on each run)
+test-results/
+playwright-report/
+
+# OS files
+.DS_Store
+.claude/
+
+# IDE
+.vscode/
+.idea/

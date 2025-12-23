@@ -1,0 +1,21 @@
+{
+  "name": "eir-site",
+  "version": "1.0.0",
+  "description": "Eir Fitness website - migrated from Wix",
+  "scripts": {
+    "serve": "npx serve -l 3000",
+    "test": "npx playwright test",
+    "test:ui": "npx playwright test --ui",
+    "test:headed": "npx playwright test --headed",
+    "test:debug": "npx playwright test --debug",
+    "test:update-snapshots": "npx playwright test --update-snapshots",
+    "report": "npx playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "serve": "^14.2.0"
+  },
+  "keywords": ["eir", "fitness", "static-site"],
+  "license": "UNLICENSED",
+  "private": true
+}

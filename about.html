@@ -997,51 +997,11 @@
 
 <!-- presets polyfill -->
 
-<script>
-// Simple form handler - stores submissions locally and shows confirmation
-document.addEventListener('DOMContentLoaded', function() {
-    const forms = document.querySelectorAll('form');
-    forms.forEach(function(form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
 
-            const formData = new FormData(form);
-            const data = {
-                timestamp: new Date().toISOString(),
-                page: window.location.pathname,
-                fields: {}
-            };
 
-            formData.forEach(function(value, key) {
-                data.fields[key] = value;
-            });
 
-            // For Netlify deployment, use Netlify Forms
-            // Add netlify attribute to forms and they'll be handled automatically
-            // For now, show a confirmation
-
-            // Store in localStorage as backup
-            const submissions = JSON.parse(localStorage.getItem('formSubmissions') || '[]');
-            submissions.push(data);
-            localStorage.setItem('formSubmissions', JSON.stringify(submissions));
-
-            // Show confirmation
-            const button = form.querySelector('button[type="submit"], input[type="submit"]');
-            if (button) {
-                const originalText = button.textContent || button.value;
-                button.textContent = 'Thank you!';
-                button.disabled = true;
-                setTimeout(function() {
-                    button.textContent = originalText;
-                    button.disabled = false;
-                }, 3000);
-            }
-
-            console.log('Form submitted:', data);
-        });
-    });
-});
-</script>
+<!-- Site Interactivity -->
+<script src="js/site.js"></script>
 
 </body>
 </html>
