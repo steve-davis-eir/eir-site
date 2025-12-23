@@ -1,0 +1,18 @@
+# Netlify configuration
+[build]
+  publish = "."
+
+# Redirects for clean URLs
+[[redirects]]
+  from = "/home"
+  to = "/"
+  status = 301
+
+# Form handling - Netlify will automatically handle forms with netlify attribute
+# Submissions can be viewed in Netlify dashboard
+
+# Headers for caching
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
