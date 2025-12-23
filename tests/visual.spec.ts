@@ -91,13 +91,12 @@ test.describe('Visual Regression - Footer', () => {
 });
 
 test.describe('Visual Regression - Mobile Menu', () => {
-  // Only run on mobile viewports
-  test.skip(({ browserName }, testInfo) => {
-    const project = testInfo.project.name;
-    return project.includes('Desktop');
-  });
-
-  test('mobile menu open state', async ({ page }) => {
+  test('mobile menu open state', async ({ page }, testInfo) => {
+    // Only run on mobile viewports
+    if (testInfo.project.name.includes('Desktop')) {
+      test.skip();
+      return;
+    }
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 

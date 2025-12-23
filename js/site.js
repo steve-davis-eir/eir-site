@@ -11,19 +11,40 @@
   // ============================================
 
   function initMobileMenu() {
-    // Find all hamburger buttons (there may be multiple for different breakpoints)
-    const hamburgerButtons = document.querySelectorAll(
-      '[aria-label="Open Site Navigation"], [aria-label="open navigation menu"]'
-    );
+    // Find all hamburger buttons - the aria-label is on the SVG inside, so find buttons containing that SVG
+    const hamburgerSvgs = document.querySelectorAll('svg[aria-label="Open Site Navigation"]');
+    const hamburgerButtons = [];
+    hamburgerSvgs.forEach(function(svg) {
+      // Walk up to find the button parent
+      let parent = svg.parentElement;
+      while (parent && parent.tagName !== 'BUTTON') {
+        parent = parent.parentElement;
+      }
+      if (parent && parent.tagName === 'BUTTON') {
+        hamburgerButtons.push(parent);
+        // Also add the SVG itself to handle clicks on it directly
+        hamburgerButtons.push(svg);
+      }
+    });
 
     // Find mobile menu container
     const mobileMenu = document.querySelector('[role="dialog"][aria-label="Site navigation"]');
 
-    // Find close button inside mobile menu (Wix uses "Back to site" label)
-    const closeButton = mobileMenu ? mobileMenu.querySelector('[aria-label="Back to site"], [aria-label="Close navigation menu"], [aria-label="close navigation menu"]') : null;
+    // Find close button inside mobile menu (Wix uses "Back to site" label on the SVG)
+    let closeButton = null;
+    if (mobileMenu) {
+      const closeSvg = mobileMenu.querySelector('svg[aria-label="Back to site"]');
+      if (closeSvg) {
+        let parent = closeSvg.parentElement;
+        while (parent && parent.tagName !== 'BUTTON') {
+          parent = parent.parentElement;
+        }
+        closeButton = parent;
+      }
+    }
 
     // Find overlay
-    const overlay = document.querySelector('[id*="overlay-"][id*="comp-kd5px"]');
+    const overlay = document.querySelector('[id*="overlay-"]');
 
     if (!mobileMenu) {
       console.log('Mobile menu not found on this page');
@@ -296,6 +317,109 @@
   }
 
   // ============================================
+  // DROPDOWN FUNCTIONALITY
+  // ============================================
+
+  function initDropdowns() {
+    // Define dropdown options for known fields
+    const dropdownOptions = {
+      'Training Type': ['Cycling', 'Running', 'Triathlon', 'Swimming', 'Other'],
+      'Primary Goal': ['Improve Performance', 'Train Smarter', 'Recovery Optimization', 'Race Preparation', 'General Fitness']
+    };
+
+    // Find all dropdown buttons (Wix combobox pattern)
+    const dropdownButtons = document.querySelectorAll('[role="combobox"]');
+
+    dropdownButtons.forEach(function(button) {
+      const label = button.getAttribute('aria-label');
+      const options = dropdownOptions[label];
+
+      if (!options) return;
+
+      // Create hidden select for form submission
+      const select = document.createElement('select');
+      select.name = label.toLowerCase().replace(/\s+/g, '_');
+      select.style.display = 'none';
+      select.innerHTML = '<option value="">Select...</option>' +
+        options.map(function(opt) {
+          return '<option value="' + opt + '">' + opt + '</option>';
+        }).join('');
+
+      // Insert select near the button
+      button.parentNode.insertBefore(select, button.nextSibling);
+
+      // Create dropdown menu
+      const menu = document.createElement('div');
+      menu.className = 'custom-dropdown-menu';
+      menu.style.cssText = 'display:none;position:absolute;background:#fff;border:1px solid #ccc;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.15);z-index:1000;min-width:200px;max-height:200px;overflow-y:auto;';
+
+      options.forEach(function(opt) {
+        const item = document.createElement('div');
+        item.className = 'custom-dropdown-item';
+        item.textContent = opt;
+        item.style.cssText = 'padding:10px 16px;cursor:pointer;';
+        item.addEventListener('mouseenter', function() {
+          this.style.background = '#f0f0f0';
+        });
+        item.addEventListener('mouseleave', function() {
+          this.style.background = '#fff';
+        });
+        item.addEventListener('click', function(e) {
+          e.stopPropagation();
+          // Update button text
+          const textEl = button.querySelector('[data-hook="dropdown-base-text"]');
+          if (textEl) {
+            textEl.textContent = opt;
+          }
+          // Update hidden select
+          select.value = opt;
+          // Close menu
+          menu.style.display = 'none';
+          button.setAttribute('aria-expanded', 'false');
+        });
+        menu.appendChild(item);
+      });
+
+      // Position menu relative to button's container
+      const container = button.closest('[data-hook="dropdown-base"]') || button.parentNode;
+      container.style.position = 'relative';
+      container.appendChild(menu);
+
+      // Toggle dropdown on button click
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const isOpen = menu.style.display === 'block';
+        // Close all other dropdowns first
+        document.querySelectorAll('.custom-dropdown-menu').forEach(function(m) {
+          m.style.display = 'none';
+        });
+        if (!isOpen) {
+          menu.style.display = 'block';
+          menu.style.top = button.offsetHeight + 'px';
+          menu.style.left = '0';
+          button.setAttribute('aria-expanded', 'true');
+        } else {
+          menu.style.display = 'none';
+          button.setAttribute('aria-expanded', 'false');
+        }
+      });
+    });
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function() {
+      document.querySelectorAll('.custom-dropdown-menu').forEach(function(menu) {
+        menu.style.display = 'none';
+      });
+      document.querySelectorAll('[role="combobox"]').forEach(function(btn) {
+        btn.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    console.log('Dropdowns initialized');
+  }
+
+  // ============================================
   // INITIALIZE ON DOM READY
   // ============================================
 
@@ -303,6 +427,7 @@
     console.log('Eir site JavaScript initializing...');
     initMobileMenu();
     initForms();
+    initDropdowns();
     initSmoothScroll();
     fixBrokenImages();
     console.log('Eir site JavaScript initialized');
