@@ -366,6 +366,9 @@
       'Primary Goal': ['Improve Performance', 'Train Smarter', 'Recovery Optimization', 'Race Preparation', 'General Fitness']
     };
 
+    // Flag to prevent document click from closing menu immediately after opening
+    var justOpened = false;
+
     // Find all dropdown buttons (Wix combobox pattern)
     const dropdownButtons = document.querySelectorAll('[role="combobox"]');
     console.log('Found dropdown buttons:', dropdownButtons.length);
@@ -453,6 +456,8 @@
           positionMenu();
           menu.style.display = 'block';
           button.setAttribute('aria-expanded', 'true');
+          justOpened = true;
+          setTimeout(function() { justOpened = false; }, 100);
           console.log('Menu opened');
         } else {
           menu.style.display = 'none';
@@ -474,7 +479,16 @@
     });
 
     // Close dropdowns when clicking outside
-    document.addEventListener('click', function() {
+    document.addEventListener('click', function(e) {
+      // Don't close if we just opened
+      if (justOpened) {
+        console.log('Ignoring document click - just opened');
+        return;
+      }
+      // Don't close if clicking inside a dropdown menu
+      if (e.target.closest('.custom-dropdown-menu')) {
+        return;
+      }
       document.querySelectorAll('.custom-dropdown-menu').forEach(function(menu) {
         menu.style.display = 'none';
       });
