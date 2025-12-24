@@ -425,10 +425,17 @@
         menu.appendChild(item);
       });
 
-      // Position menu relative to button's container
-      const container = button.closest('[data-hook="dropdown-base"]') || button.parentNode;
-      container.style.position = 'relative';
-      container.appendChild(menu);
+      // Append menu to body to avoid overflow:hidden clipping
+      document.body.appendChild(menu);
+
+      // Position menu function
+      function positionMenu() {
+        const rect = button.getBoundingClientRect();
+        menu.style.position = 'fixed';
+        menu.style.top = (rect.bottom + 2) + 'px';
+        menu.style.left = rect.left + 'px';
+        menu.style.width = rect.width + 'px';
+      }
 
       // Toggle dropdown on button click - use capture to fire before other handlers
       function handleDropdownClick(e) {
@@ -443,9 +450,8 @@
           m.style.display = 'none';
         });
         if (!isOpen) {
+          positionMenu();
           menu.style.display = 'block';
-          menu.style.top = button.offsetHeight + 'px';
-          menu.style.left = '0';
           button.setAttribute('aria-expanded', 'true');
           console.log('Menu opened');
         } else {
