@@ -368,12 +368,18 @@
 
     // Find all dropdown buttons (Wix combobox pattern)
     const dropdownButtons = document.querySelectorAll('[role="combobox"]');
+    console.log('Found dropdown buttons:', dropdownButtons.length);
 
     dropdownButtons.forEach(function(button) {
       const label = button.getAttribute('aria-label');
+      console.log('Processing dropdown:', label);
       const options = dropdownOptions[label];
 
-      if (!options) return;
+      if (!options) {
+        console.log('No options defined for:', label);
+        return;
+      }
+      console.log('Creating dropdown menu for:', label);
 
       // Create hidden select for form submission
       const select = document.createElement('select');
@@ -424,11 +430,14 @@
       container.style.position = 'relative';
       container.appendChild(menu);
 
-      // Toggle dropdown on button click
-      button.addEventListener('click', function(e) {
+      // Toggle dropdown on button click - use capture to fire before other handlers
+      function handleDropdownClick(e) {
+        console.log('Dropdown clicked:', label);
         e.preventDefault();
         e.stopPropagation();
+        e.stopImmediatePropagation();
         const isOpen = menu.style.display === 'block';
+        console.log('Menu is currently open:', isOpen);
         // Close all other dropdowns first
         document.querySelectorAll('.custom-dropdown-menu').forEach(function(m) {
           m.style.display = 'none';
@@ -438,9 +447,22 @@
           menu.style.top = button.offsetHeight + 'px';
           menu.style.left = '0';
           button.setAttribute('aria-expanded', 'true');
+          console.log('Menu opened');
         } else {
           menu.style.display = 'none';
           button.setAttribute('aria-expanded', 'false');
+          console.log('Menu closed');
+        }
+      }
+      button.addEventListener('click', handleDropdownClick, true);
+      // Also add mousedown handler as backup
+      button.addEventListener('mousedown', function(e) {
+        if (e.button === 0) { // Left click only
+          setTimeout(function() {
+            if (menu.style.display !== 'block') {
+              handleDropdownClick(e);
+            }
+          }, 10);
         }
       });
     });
