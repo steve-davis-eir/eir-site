@@ -180,4 +180,101 @@ test.describe('Waitlist Form', () => {
     const form = page.locator('form').first();
     await expect(form).toBeVisible();
   });
+
+  test('dropdown Training Type can be clicked and shows options', async ({ page }) => {
+    // Find the Training Type dropdown button
+    const dropdown = page.locator('[role="combobox"][aria-label="Training Type"]');
+    await expect(dropdown).toBeVisible();
+
+    // Click the dropdown
+    await dropdown.click();
+
+    // Wait for custom dropdown menu to appear
+    await page.waitForTimeout(300);
+
+    // Check that a visible dropdown menu appeared
+    const menu = page.locator('.custom-dropdown-menu:visible').first();
+    await expect(menu).toBeVisible();
+
+    // Click on "Cycling" option
+    const cyclingOption = menu.locator('text=Cycling');
+    await cyclingOption.click();
+
+    // Verify the dropdown button text changed
+    const dropdownText = page.locator('[role="combobox"][aria-label="Training Type"] [data-hook="dropdown-base-text"]');
+    await expect(dropdownText).toHaveText('Cycling');
+  });
+
+  test('dropdown Primary Goal can be clicked and shows options', async ({ page }) => {
+    // Find the Primary Goal dropdown button
+    const dropdown = page.locator('[role="combobox"][aria-label="Primary Goal"]');
+    await expect(dropdown).toBeVisible();
+
+    // Click the dropdown
+    await dropdown.click();
+
+    // Wait for custom dropdown menu to appear
+    await page.waitForTimeout(300);
+
+    // Check that a visible dropdown menu appeared
+    const menu = page.locator('.custom-dropdown-menu:visible').first();
+    await expect(menu).toBeVisible();
+
+    // Click on an option
+    const option = menu.locator('text=Train Smarter');
+    await option.click();
+
+    // Verify the dropdown button text changed
+    const dropdownText = page.locator('[role="combobox"][aria-label="Primary Goal"] [data-hook="dropdown-base-text"]');
+    await expect(dropdownText).toHaveText('Train Smarter');
+  });
+});
+
+test.describe('Join Form', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/join.html');
+    await page.evaluate(() => localStorage.clear());
+    await page.waitForLoadState('networkidle');
+  });
+
+  test('join page loads', async ({ page }) => {
+    await expect(page).toHaveURL(/join/);
+  });
+
+  test('join form exists', async ({ page }) => {
+    const form = page.locator('form').first();
+    await expect(form).toBeVisible();
+  });
+
+  test('dropdown Training Type can be clicked on join page', async ({ page }) => {
+    // Find the Training Type dropdown button
+    const dropdown = page.locator('[role="combobox"][aria-label="Training Type"]');
+    await expect(dropdown).toBeVisible();
+
+    // Click the dropdown
+    await dropdown.click();
+
+    // Wait for custom dropdown menu to appear
+    await page.waitForTimeout(300);
+
+    // Check that a visible dropdown menu appeared
+    const menu = page.locator('.custom-dropdown-menu:visible').first();
+    await expect(menu).toBeVisible();
+  });
+
+  test('dropdown Primary Goal can be clicked on join page', async ({ page }) => {
+    // Find the Primary Goal dropdown button
+    const dropdown = page.locator('[role="combobox"][aria-label="Primary Goal"]');
+    await expect(dropdown).toBeVisible();
+
+    // Click the dropdown
+    await dropdown.click();
+
+    // Wait for custom dropdown menu to appear
+    await page.waitForTimeout(300);
+
+    // Check that a visible dropdown menu appeared
+    const menu = page.locator('.custom-dropdown-menu:visible').first();
+    await expect(menu).toBeVisible();
+  });
 });

@@ -317,6 +317,45 @@
   }
 
   // ============================================
+  // FIX CHECKBOXES
+  // ============================================
+
+  function initCheckboxes() {
+    // Wix checkboxes have hidden inputs with overlay styling
+    // Make the whole label area clickable
+    const checkboxLabels = document.querySelectorAll('[data-hook="checkbox-core"]');
+
+    checkboxLabels.forEach(function(label) {
+      const checkbox = label.querySelector('input[type="checkbox"]');
+      if (!checkbox) return;
+
+      // Ensure checkbox is clickable
+      label.style.cursor = 'pointer';
+
+      // Handle clicks on the label and its children
+      label.addEventListener('click', function(e) {
+        // Don't double-toggle if clicking directly on the input
+        if (e.target === checkbox) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+        checkbox.checked = !checkbox.checked;
+
+        // Update data-checked attribute on wrapper
+        const wrapper = label.closest('[data-hook="checkbox-wrapper"]');
+        if (wrapper) {
+          wrapper.setAttribute('data-checked', checkbox.checked.toString());
+        }
+
+        // Trigger change event
+        checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    });
+
+    console.log('Checkboxes initialized:', checkboxLabels.length);
+  }
+
+  // ============================================
   // DROPDOWN FUNCTIONALITY
   // ============================================
 
@@ -428,6 +467,7 @@
     initMobileMenu();
     initForms();
     initDropdowns();
+    initCheckboxes();
     initSmoothScroll();
     fixBrokenImages();
     console.log('Eir site JavaScript initialized');
