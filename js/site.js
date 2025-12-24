@@ -390,15 +390,15 @@
       // Create dropdown menu
       const menu = document.createElement('div');
       menu.className = 'custom-dropdown-menu';
-      menu.style.cssText = 'display:none;position:absolute;background:#fff;border:1px solid #ccc;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.15);z-index:1000;min-width:200px;max-height:200px;overflow-y:auto;';
+      menu.style.cssText = 'display:none;position:absolute;background:#ffffff;border:1px solid #333;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,0.25);z-index:999999;min-width:200px;max-height:200px;overflow-y:auto;color:#000;';
 
       options.forEach(function(opt) {
         const item = document.createElement('div');
         item.className = 'custom-dropdown-item';
         item.textContent = opt;
-        item.style.cssText = 'padding:10px 16px;cursor:pointer;';
+        item.style.cssText = 'padding:12px 16px;cursor:pointer;color:#000;background:#fff;font-size:14px;';
         item.addEventListener('mouseenter', function() {
-          this.style.background = '#f0f0f0';
+          this.style.background = '#e0e0e0';
         });
         item.addEventListener('mouseleave', function() {
           this.style.background = '#fff';
