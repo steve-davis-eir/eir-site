@@ -440,42 +440,75 @@
         menu.style.width = rect.width + 'px';
       }
 
-      // Toggle dropdown on button click - use capture to fire before other handlers
-      function handleDropdownClick(e) {
-        console.log('Dropdown clicked:', label);
+      // Track if this menu is open
+      var isMenuOpen = false;
+
+      // Toggle dropdown on click
+      function toggleMenu(e) {
+        console.log('Toggle menu:', label, 'currently open:', isMenuOpen);
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        const isOpen = menu.style.display === 'block';
-        console.log('Menu is currently open:', isOpen);
+
         // Close all other dropdowns first
         document.querySelectorAll('.custom-dropdown-menu').forEach(function(m) {
-          m.style.display = 'none';
+          if (m !== menu) m.style.display = 'none';
         });
-        if (!isOpen) {
+
+        if (!isMenuOpen) {
           positionMenu();
           menu.style.display = 'block';
-          button.setAttribute('aria-expanded', 'true');
+          isMenuOpen = true;
           justOpened = true;
-          setTimeout(function() { justOpened = false; }, 100);
+          button.setAttribute('aria-expanded', 'true');
           console.log('Menu opened');
+          // Reset justOpened after a delay
+          setTimeout(function() {
+            justOpened = false;
+            console.log('justOpened reset to false');
+          }, 300);
         } else {
           menu.style.display = 'none';
+          isMenuOpen = false;
           button.setAttribute('aria-expanded', 'false');
           console.log('Menu closed');
         }
+        return false;
       }
-      button.addEventListener('click', handleDropdownClick, true);
-      // Also add mousedown handler as backup
-      button.addEventListener('mousedown', function(e) {
-        if (e.button === 0) { // Left click only
-          setTimeout(function() {
-            if (menu.style.display !== 'block') {
-              handleDropdownClick(e);
-            }
-          }, 10);
-        }
-      });
+
+      // Close this specific menu
+      function closeMenu() {
+        menu.style.display = 'none';
+        isMenuOpen = false;
+        button.setAttribute('aria-expanded', 'false');
+      }
+
+      // Create a transparent overlay to capture clicks
+      var overlay = document.createElement('div');
+      overlay.style.cssText = 'position:absolute;top:0;left:0;right:0;bottom:0;z-index:10;cursor:pointer;background:transparent;';
+      button.style.position = 'relative';
+      button.appendChild(overlay);
+
+      // Handle clicks on overlay
+      overlay.addEventListener('click', function(e) {
+        console.log('Overlay clicked for:', label);
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        toggleMenu(e);
+      }, true);
+
+      // Also handle on button itself as backup
+      button.addEventListener('click', function(e) {
+        console.log('Button clicked for:', label);
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        toggleMenu(e);
+      }, true);
+
+      // Store closeMenu function for use by document handler
+      button._closeDropdownMenu = closeMenu;
     });
 
     // Close dropdowns when clicking outside
